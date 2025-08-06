@@ -11,14 +11,14 @@ import Database from './db.js';
 
 /**
  * Default export - The main Queue class for task queue management.
- * @type {Queue}
+ * @type {typeof Queue}
  */
 export default Queue;
 
 /**
  * Named exports for Queue and Database classes.
  * @type {Object}
- * @property {Queue} Queue - The main queue class for task management
- * @property {Database} Database - The database class for direct database operations
+ * @property {typeof Queue} Queue - The main queue class for task management
+ * @property {typeof Database} Database - The database class for direct database operations
  */
 export { Queue, Database };
