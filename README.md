@@ -1,4 +1,4 @@
-# SQLite Queue
+# LiteQuu
 
 A simple, persistent task queue for Node.js using SQLite as storage. Tasks are processed in the main thread with configurable concurrency, automatic retries with exponential backoff, and comprehensive event handling.
 
