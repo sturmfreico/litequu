@@ -137,7 +137,7 @@ async function apiWorkerExample() {
 
     console.log('Adding API tasks to queue...\n');
     for (const task of apiTasks) {
-      await queue.add(task);
+      queue.add(task);
       await new Promise((resolve) => setTimeout(resolve, 500)); // Stagger task addition
     }
 
@@ -155,7 +155,7 @@ async function apiWorkerExample() {
       const randomEndpoint =
         endpoints[Math.floor(Math.random() * endpoints.length)];
 
-      await queue.add({
+      queue.add({
         method: 'GET',
         url: `https://service-${taskId}.example.com${randomEndpoint}`,
         headers: { 'X-Request-ID': `req-${taskId}` },
@@ -214,7 +214,7 @@ async function apiWorkerExample() {
       );
       console.log(`  Total retries: ${stats.retried}`);
 
-      const dbStats = await queue.getStats();
+      const dbStats = queue.getStats();
       console.log('\n📋 Database Statistics:');
       dbStats.forEach((stat) => {
         console.log(`  ${stat.status}: ${stat.count} tasks`);

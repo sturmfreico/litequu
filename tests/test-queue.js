@@ -39,9 +39,9 @@ describe('Queue', () => {
   });
 
   describe('add', () => {
-    it('should add a task and return task ID', async () => {
+    it('should add a task and return task ID', () => {
       const taskData = { type: 'test', data: 123 };
-      const taskId = await queue.add(taskData);
+      const taskId = queue.add(taskData);
 
       expect(taskId).toBeTypeOf('number');
       expect(taskId).toBeGreaterThan(0);
@@ -58,7 +58,7 @@ describe('Queue', () => {
         });
       });
 
-      await queue.add(taskData);
+      queue.add(taskData);
       await addedPromise;
     });
 
@@ -69,8 +69,8 @@ describe('Queue', () => {
         metadata: { timestamp: Date.now() },
       };
 
-      const taskId = await queue.add(complexData);
-      const task = await queue.getTask(taskId);
+      const taskId = queue.add(complexData);
+      const task = queue.getTask(taskId);
 
       expect(JSON.parse(task.task_data)).toEqual(complexData);
     });
@@ -79,7 +79,7 @@ describe('Queue', () => {
   describe('processOnce', () => {
     it('should process a single task successfully', async () => {
       const taskData = { value: 42 };
-      await queue.add(taskData);
+      queue.add(taskData);
 
       const results = [];
       await queue.processOnce(async (data) => {
@@ -101,13 +101,13 @@ describe('Queue', () => {
         });
       });
 
-      await queue.add({ value: 10 });
+      queue.add({ value: 10 });
       await queue.processOnce(async (data) => data.value * 2);
       await completedPromise;
     });
 
     it('should handle task failure and retry', async () => {
-      await queue.add({ shouldFail: true });
+      queue.add({ shouldFail: true });
 
       let attempts = 0;
       const retryEvents = [];
@@ -141,7 +141,7 @@ describe('Queue', () => {
     });
 
     it('should emit failed event after max retries exceeded', async () => {
-      await queue.add({ alwaysFail: true });
+      queue.add({ alwaysFail: true });
 
       const failedEvents = [];
       queue.on('failed', (info) => {
@@ -202,7 +202,7 @@ describe('Queue', () => {
 
   describe('exponential backoff', () => {
     it('should calculate correct retry delays', async () => {
-      await queue.add({ fail: true });
+      queue.add({ fail: true });
 
       const retryEvents = [];
       queue.on('retried', (info) => {
@@ -234,15 +234,15 @@ describe('Queue', () => {
 
   describe('getStats', () => {
     it('should return queue statistics', async () => {
-      await queue.add({ task: 1 });
-      await queue.add({ task: 2 });
+      queue.add({ task: 1 });
+      queue.add({ task: 2 });
 
       await queue.processOnce(async (data) => {
         if (data.task === 1) return 'success';
         throw new Error('Fail');
       });
 
-      const stats = await queue.getStats();
+      const stats = queue.getStats();
       expect(stats).toBeInstanceOf(Array);
 
       const completedStats = stats.find((s) => s.status === 'completed');

@@ -88,19 +88,19 @@ async function autoProcessingExample() {
     // Add some initial tasks
     console.log('Adding initial email tasks...\n');
 
-    await queue.add({
+    queue.add({
       type: 'welcome_email',
       email: 'john@example.com',
       userId: 1,
     });
 
-    await queue.add({
+    queue.add({
       type: 'newsletter',
       email: 'jane@example.com',
       subject: 'Weekly Updates',
     });
 
-    await queue.add({
+    queue.add({
       type: 'password_reset',
       email: 'admin@example.com',
       token: 'abc123',
@@ -115,7 +115,7 @@ async function autoProcessingExample() {
       const randomEmail = emails[Math.floor(Math.random() * emails.length)];
       const randomType = types[Math.floor(Math.random() * types.length)];
 
-      await queue.add({
+      queue.add({
         type: randomType,
         email: randomEmail,
         userId: taskCounter++,
@@ -126,7 +126,7 @@ async function autoProcessingExample() {
 
     // Show queue status periodically
     const statusInterval = setInterval(async () => {
-      const stats = await queue.getStats();
+      const stats = queue.getStats();
       const status = queue.status;
 
       console.log('\n📊 Queue Status:');
@@ -152,7 +152,7 @@ async function autoProcessingExample() {
       await new Promise((resolve) => setTimeout(resolve, 5000));
 
       // Show final stats
-      const finalStats = await queue.getStats();
+      const finalStats = queue.getStats();
       console.log('\n📈 Final Statistics:');
       finalStats.forEach((stat) => {
         console.log(`  ${stat.status}: ${stat.count} tasks`);

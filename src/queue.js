@@ -19,9 +19,9 @@ class Queue extends EventEmitter {
     this.pollingTimer = null;
   }
 
-  async add(taskData) {
+  add(taskData) {
     try {
-      const taskId = await this.db.insertTask(JSON.stringify(taskData));
+      const taskId = this.db.insertTask(JSON.stringify(taskData));
       this.emit('added', { taskId, taskData });
 
       // If auto-processing is enabled and we have a handler, trigger processing
@@ -77,7 +77,7 @@ class Queue extends EventEmitter {
       }
 
       const now = new Date().toISOString();
-      const tasks = await this.db.getPendingTasks(availableSlots, now);
+      const tasks = this.db.getPendingTasks(availableSlots, now);
 
       const processingPromises = tasks.map((task) =>
         this._processTask(task, handlerToUse)
@@ -104,12 +104,7 @@ class Queue extends EventEmitter {
     this.currentRunning++;
 
     try {
-      await this.db.updateTaskStatus(
-        task.id,
-        'processing',
-        task.retry_count,
-        null
-      );
+      this.db.updateTaskStatus(task.id, 'processing', task.retry_count, null);
 
       let taskData;
       try {
@@ -119,12 +114,7 @@ class Queue extends EventEmitter {
       }
 
       const result = await handler(taskData);
-      await this.db.updateTaskStatus(
-        task.id,
-        'completed',
-        task.retry_count,
-        null
-      );
+      this.db.updateTaskStatus(task.id, 'completed', task.retry_count, null);
       this.emit('completed', { taskId: task.id, result, taskData });
     } catch (error) {
       await this._handleTaskFailure(task, error);
@@ -144,12 +134,7 @@ class Queue extends EventEmitter {
       const delay = Math.floor(jitterDelay);
       const nextRetryAt = new Date(Date.now() + delay).toISOString();
 
-      await this.db.updateTaskStatus(
-        task.id,
-        'failed',
-        retryCount,
-        nextRetryAt
-      );
+      this.db.updateTaskStatus(task.id, 'failed', retryCount, nextRetryAt);
 
       let taskData;
       try {
@@ -168,7 +153,7 @@ class Queue extends EventEmitter {
         error: error.message,
       });
     } else {
-      await this.db.updateTaskStatus(task.id, 'failed', retryCount, null);
+      this.db.updateTaskStatus(task.id, 'failed', retryCount, null);
 
       let taskData;
       try {
@@ -206,16 +191,16 @@ class Queue extends EventEmitter {
     }
   }
 
-  async getStats() {
-    return await this.db.getTaskStats();
+  getStats() {
+    return this.db.getTaskStats();
   }
 
-  async getTask(id) {
-    return await this.db.getTaskById(id);
+  getTask(id) {
+    return this.db.getTaskById(id);
   }
 
-  async cleanup(olderThanHours = 24) {
-    return await this.db.cleanupCompletedTasks(olderThanHours);
+  cleanup(olderThanHours = 24) {
+    return this.db.cleanupCompletedTasks(olderThanHours);
   }
 
   async close() {
@@ -226,7 +211,7 @@ class Queue extends EventEmitter {
       await new Promise((resolve) => setTimeout(resolve, 100));
     }
 
-    await this.db.close();
+    return this.db.close();
   }
 
   // Getter for current queue status

@@ -30,7 +30,7 @@ describe('Integration Tests', () => {
       ];
 
       // Add all tasks
-      const taskIds = await Promise.all(tasks.map((task) => queue.add(task)));
+      const taskIds = tasks.map((task) => queue.add(task));
       expect(taskIds).toHaveLength(5);
 
       // Track events
@@ -164,8 +164,8 @@ describe('Integration Tests', () => {
 
     it('should persist tasks across queue restarts', async () => {
       // Add tasks to first queue instance
-      await queue.add({ persistent: true, data: 'test1' });
-      await queue.add({ persistent: true, data: 'test2' });
+      queue.add({ persistent: true, data: 'test1' });
+      queue.add({ persistent: true, data: 'test2' });
 
       // Close the queue
       await queue.close();
@@ -237,8 +237,8 @@ describe('Integration Tests', () => {
   describe('Cleanup and maintenance', () => {
     it('should clean up old completed tasks', async () => {
       // Add and process some tasks
-      await queue.add({ test: 'cleanup1' });
-      await queue.add({ test: 'cleanup2' });
+      queue.add({ test: 'cleanup1' });
+      queue.add({ test: 'cleanup2' });
 
       await queue.processOnce(async () => {
         return 'completed';
@@ -251,10 +251,10 @@ describe('Integration Tests', () => {
         WHERE status = 'completed'
       `);
 
-      const cleanupResult = await queue.cleanup(24);
+      const cleanupResult = queue.cleanup(24);
       expect(cleanupResult.changes).toBe(2);
 
-      const stats = await queue.getStats();
+      const stats = queue.getStats();
       const completedCount =
         stats.find((s) => s.status === 'completed')?.count || 0;
       expect(completedCount).toBe(0);

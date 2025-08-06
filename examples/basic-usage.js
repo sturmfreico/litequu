@@ -39,25 +39,25 @@ async function basicExample() {
     // Add various types of tasks
     console.log('Adding tasks to queue...\n');
 
-    await queue.add({
+    queue.add({
       type: 'calculate',
       operation: 'multiply',
       values: [6, 7],
     });
 
-    await queue.add({
+    queue.add({
       type: 'api_call',
       url: 'https://jsonplaceholder.typicode.com/posts/1',
       method: 'GET',
     });
 
-    await queue.add({
+    queue.add({
       type: 'file_process',
       filename: 'data.txt',
       action: 'count_lines',
     });
 
-    await queue.add({
+    queue.add({
       type: 'simulate_failure',
       fail_chance: 0.7, // 70% chance to fail
     });
@@ -117,14 +117,14 @@ async function basicExample() {
       // Wait a bit between rounds to see retry delays in action
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      const stats = await queue.getStats();
+      const stats = queue.getStats();
       console.log('Queue stats:', stats);
       console.log('');
     }
 
     // Show final statistics
     console.log('Final Queue Statistics:');
-    const finalStats = await queue.getStats();
+    const finalStats = queue.getStats();
     finalStats.forEach((stat) => {
       console.log(`  ${stat.status}: ${stat.count} tasks`);
     });
