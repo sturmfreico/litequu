@@ -1,0 +1,44 @@
+{
+  "name": "sqlite-queue",
+  "version": "1.0.0",
+  "description": "A simple same-thread queuing system for Node.js using SQLite with retry mechanism and exponential backoff",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "test": "vitest --no-watch",
+    "lint": "eslint src/ tests/",
+    "example": "node examples/basic-usage.js"
+  },
+  "keywords": [
+    "queue",
+    "sqlite",
+    "task",
+    "retry",
+    "backoff",
+    "job"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.32.0",
+    "vitest": "^3.2.4",
+    "eslint": "^9.32.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.3",
+    "prettier": "^3.6.2"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/your-username/sqlite-queue.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/sqlite-queue/issues"
+  },
+  "homepage": "https://github.com/your-username/sqlite-queue#readme"
+}
