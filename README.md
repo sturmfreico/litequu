@@ -16,13 +16,13 @@ A simple, persistent task queue for Node.js using SQLite as storage. Tasks are p
 ## Installation
 
 ```bash
-npm install litequu
+npm i @sturmfrei/litequu
 ```
 
 ## Quick Start
 
 ```javascript
-import Queue from 'litequu';
+import Queue from '@sturmfrei/litequu';
 
 // Create a queue
 const queue = new Queue({
@@ -248,7 +248,7 @@ With jitter enabled (default), actual delays will vary by ±50% to prevent thund
 ### Basic Usage
 
 ```javascript
-import Queue from 'litequu';
+import Queue from '@sturmfrei/litequu';
 
 const queue = new Queue();
 
