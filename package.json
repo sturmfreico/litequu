@@ -22,7 +22,7 @@
     "backoff",
     "job"
   ],
-  "author": "",
+  "author": "Christoph von Gellhorn",
   "license": "MIT",
   "dependencies": {
     "better-sqlite3": "^11.6.0"
@@ -40,10 +40,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/your-username/sqlite-queue.git"
+    "url": "git+https://github.com/sturmfreico/litequu"
   },
   "bugs": {
-    "url": "https://github.com/your-username/sqlite-queue/issues"
+    "url": "https://github.com/sturmfreico/litequu/issues"
   },
-  "homepage": "https://github.com/your-username/sqlite-queue#readme"
+  "homepage": "https://github.com/sturmfreico/litequu"
 }
