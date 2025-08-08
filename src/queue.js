@@ -18,8 +18,8 @@ class Queue extends EventEmitter {
    * @param {Object} [options={}] - Configuration options for the queue
    * @param {string} [options.dbPath='./queue.db'] - Path to the SQLite database file
    * @param {number} [options.maxConcurrent=5] - Maximum number of tasks to process concurrently
-   * @param {number} [options.maxRetries=3] - Maximum number of retry attempts for failed tasks
-   * @param {number} [options.baseRetryDelay=1000] - Base delay in milliseconds between retries (exponential backoff)
+   * @param {number} [options.maxRetries=15] - Maximum number of retry attempts for failed tasks
+   * @param {number} [options.baseRetryDelay=15_000] - Base delay in milliseconds between retries (exponential backoff)
    * @param {number} [options.pollingInterval=1000] - Interval in milliseconds for polling new tasks
    * @param {boolean} [options.autoProcess=true] - Whether to automatically process tasks when added
    * @param {boolean} [options.jitter=true] - Whether to add randomness to retry delays
@@ -28,8 +28,8 @@ class Queue extends EventEmitter {
     super();
     this.dbPath = options.dbPath || './queue.db';
     this.maxConcurrent = options.maxConcurrent || 5;
-    this.maxRetries = options.maxRetries || 3;
-    this.baseRetryDelay = options.baseRetryDelay || 1000; // 1 second
+    this.maxRetries = options.maxRetries || 15;
+    this.baseRetryDelay = options.baseRetryDelay || 15_000; // 15 seconds
     this.pollingInterval = options.pollingInterval || 1000; // 1 second
     this.autoProcess = options.autoProcess !== false; // defaults to true
     this.jitter = options.jitter !== false; // adds randomness to retry delays

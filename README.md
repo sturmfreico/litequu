@@ -72,10 +72,10 @@ const queue = new Queue({
   // Maximum concurrent tasks (default: 5)
   maxConcurrent: 3,
 
-  // Maximum retry attempts (default: 3)
+  // Maximum retry attempts (default: 15)
   maxRetries: 5,
 
-  // Base retry delay in milliseconds (default: 1000)
+  // Base retry delay in milliseconds (default: 15_000ms)
   baseRetryDelay: 2000,
 
   // Polling interval for auto-processing (default: 1000ms)
