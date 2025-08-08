@@ -234,12 +234,29 @@ queue.on('error', (info) => {
 
 ## Retry Mechanism
 
-Tasks that fail are automatically retried with exponential backoff:
+Tasks that fail are automatically retried with exponential backoff. The delay is roughly calculated as follows:
 
-- **Retry 1**: `baseRetryDelay` (default: 1 second)
-- **Retry 2**: `baseRetryDelay * 2` (2 seconds)
-- **Retry 3**: `baseRetryDelay * 4` (4 seconds)
-- etc.
+| Attempt | Next backoff                 | Total wait                        |
+| ------- | ---------------------------- | --------------------------------- |
+| 1       | 0d 0h 0m 7.5s – 0d 0h 0m 15s | 0d 0h 0m 7.5s – 0d 0h 0m 15s      |
+| 2       | 0d 0h 0m 15s – 0d 0h 0m 30s  | 0d 0h 0m 22.5s – 0d 0h 0m 45s     |
+| 3       | 0d 0h 0m 30s – 0d 0h 1m 0s   | 0d 0h 0m 52.5s – 0d 0h 1m 45s     |
+| 4       | 0d 0h 1m 0s – 0d 0h 2m 0s    | 0d 0h 1m 52.5s – 0d 0h 3m 45s     |
+| 5       | 0d 0h 2m 0s – 0d 0h 4m 0s    | 0d 0h 3m 52.5s – 0d 0h 7m 45s     |
+| 6       | 0d 0h 4m 0s – 0d 0h 8m 0s    | 0d 0h 7m 52.5s – 0d 0h 15m 45s    |
+| 7       | 0d 0h 8m 0s – 0d 0h 16m 0s   | 0d 0h 15m 52.5s – 0d 0h 31m 45s   |
+| 8       | 0d 0h 16m 0s – 0d 0h 32m 0s  | 0d 0h 31m 52.5s – 0d 1h 3m 45s    |
+| 9       | 0d 0h 32m 0s – 0d 1h 4m 0s   | 0d 1h 3m 52.5s – 0d 2h 7m 45s     |
+| 10      | 0d 1h 4m 0s – 0d 2h 8m 0s    | 0d 2h 7m 52.5s – 0d 4h 15m 45s    |
+| 11      | 0d 2h 8m 0s – 0d 4h 16m 0s   | 0d 4h 15m 52.5s – 0d 8h 31m 45s   |
+| 12      | 0d 4h 16m 0s – 0d 8h 32m 0s  | 0d 8h 31m 52.5s – 0d 17h 3m 45s   |
+| 13      | 0d 8h 32m 0s – 0d 17h 4m 0s  | 0d 17h 3m 52.5s – 1d 10h 7m 45s   |
+| 14      | 0d 17h 4m 0s – 1d 10h 8m 0s  | 1d 10h 7m 52.5s – 2d 20h 15m 45s  |
+| 15      | 1d 10h 8m 0s – 2d 20h 16m 0s | 2d 20h 15m 52.5s – 5d 16h 31m 45s |
+
+The formula for the delay is:
+
+`floor(baseRetryDelay * 2^(retryCount - 1) * (jitter ? (0.5 + Math.random() * 0.5) : 1))`.
 
 With jitter enabled (default), actual delays will vary by ±50% to prevent thundering herd effects.
 
