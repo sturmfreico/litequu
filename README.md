@@ -78,8 +78,8 @@ const queue = new Queue({
   // Base retry delay in milliseconds (default: 15_000ms)
   baseRetryDelay: 2000,
 
-  // Polling interval for auto-processing (default: 1000ms)
-  pollingInterval: 500,
+  // Polling interval for auto-processing (default: 5000ms)
+  pollingInterval: 1000,
 
   // Enable automatic processing (default: true)
   autoProcess: true,

@@ -22,8 +22,8 @@ describe('Queue', () => {
     it('should create queue with default options', () => {
       const defaultQueue = new Queue();
       expect(defaultQueue.maxConcurrent).toBe(5);
-      expect(defaultQueue.maxRetries).toBe(3);
-      expect(defaultQueue.baseRetryDelay).toBe(1000);
+      expect(defaultQueue.maxRetries).toBe(15);
+      expect(defaultQueue.baseRetryDelay).toBe(15_000);
     });
 
     it('should create queue with custom options', () => {
