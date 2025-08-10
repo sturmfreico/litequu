@@ -1,4 +1,4 @@
-# SQLite Queue Implementation Summary
+# LiteQuu Implementation Summary
 
 ## Project Overview
 
