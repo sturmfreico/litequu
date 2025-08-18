@@ -38,7 +38,7 @@ class Queue extends EventEmitter {
     this.currentRunning = 0;
     this.isProcessing = false;
     this.handler = null;
-    this.pollingTimer = null;
+    this.pollingTimer = null; // used as a one-shot wake-up timer
   }
 
   /**
@@ -54,8 +54,10 @@ class Queue extends EventEmitter {
       const taskId = this.db.insertTask(JSON.stringify(taskData));
       this.emit('added', { taskId, taskData });
 
-      // If auto-processing is enabled and we have a handler, trigger processing
+      // If auto-processing is enabled and we have a handler, trigger processing immediately
       if (this.autoProcess && this.handler && !this.isProcessing) {
+        // Cancel any scheduled wake since we have immediate work now
+        this.stopPolling();
         setImmediate(() => this._processNextBatch());
       }
 
@@ -147,6 +149,8 @@ class Queue extends EventEmitter {
     } finally {
       if (!oneTimeHandler) {
         this.isProcessing = false;
+        // Now that processing flag is reset, schedule or adjust next wake
+        this._scheduleNextWake();
       }
     }
   }
@@ -220,6 +224,9 @@ class Queue extends EventEmitter {
         delay,
         error: error.message,
       });
+
+      // Ensure a wake-up is scheduled for future processing
+      this._scheduleNextWake();
     } else {
       this.db.updateTaskStatus(task.id, 'failed', retryCount, null);
 
@@ -233,8 +240,8 @@ class Queue extends EventEmitter {
 
       this.emit('failed', {
         taskId: task.id,
-        taskData,
         error: error.message,
+        taskData,
         retryCount,
       });
     }
@@ -246,15 +253,13 @@ class Queue extends EventEmitter {
    * @returns {void}
    */
   _startPolling() {
-    if (this.pollingTimer) {
-      return; // Already polling
+    // Start by scheduling an immediate wake to process any ready tasks now
+    if (!this.isProcessing && this.handler) {
+      setImmediate(() => this._processNextBatch());
     }
 
-    this.pollingTimer = setInterval(() => {
-      if (!this.isProcessing && this.handler) {
-        this._processNextBatch();
-      }
-    }, this.pollingInterval);
+    // After that, rely on one-shot wake scheduling instead of a persistent interval
+    this._scheduleNextWake();
   }
 
   /**
@@ -263,9 +268,52 @@ class Queue extends EventEmitter {
    */
   stopPolling() {
     if (this.pollingTimer) {
-      clearInterval(this.pollingTimer);
+      clearTimeout(this.pollingTimer);
       this.pollingTimer = null;
     }
+  }
+
+  /**
+   * Schedule a one-shot wake-up based on the earliest next_retry_at.
+   * Uses unref() so it won't keep the process alive when idle.
+   * If there are no scheduled retries, no timer is set.
+   * @private
+   */
+  _scheduleNextWake() {
+    // Clear any existing timer first
+    this.stopPolling();
+
+    // Nothing to schedule if we are not auto-processing or have no handler
+    if (!this.autoProcess || !this.handler) {
+      return;
+    }
+
+    // If there are currently tasks running or we're processing, no need to schedule
+    if (this.isProcessing || this.currentRunning > 0) {
+      return;
+    }
+
+    const earliest = this.db.getEarliestNextRetryTime();
+
+    // No scheduled retries, remain idle. New tasks will wake via add().
+    if (!earliest) {
+      return;
+    }
+
+    const delay = Math.max(0, new Date(earliest).getTime() - Date.now());
+    const timer = setTimeout(() => {
+      // Guard: handler might have been removed/stopped
+      if (!this.isProcessing && this.handler) {
+        this._processNextBatch();
+      }
+    }, delay);
+
+    // Do not keep the process alive while waiting
+    if (typeof timer.unref === 'function') {
+      timer.unref();
+    }
+
+    this.pollingTimer = timer;
   }
 
   /**

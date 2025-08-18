@@ -151,6 +151,24 @@ class Database {
   }
 
   /**
+   * Retrieves the earliest next_retry_at timestamp among failed tasks.
+   * Used to schedule the next wake-up when there are no ready tasks.
+   * @returns {string|null} ISO timestamp of the earliest next_retry_at or null if none
+   */
+  getEarliestNextRetryTime() {
+    this.initialize();
+    const row = this.get(
+      `
+      SELECT next_retry_at FROM queue
+      WHERE status = 'failed' AND next_retry_at IS NOT NULL
+      ORDER BY next_retry_at ASC
+      LIMIT 1
+    `
+    );
+    return row?.next_retry_at || null;
+  }
+
+  /**
    * Updates the status and retry information for a specific task.
    * @param {number} id - The task ID to update
    * @param {string} status - New status ('pending', 'processing', 'completed', 'failed')
