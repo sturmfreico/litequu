@@ -33,7 +33,7 @@ const queue = new Queue({
 });
 
 // Add tasks
-await queue.add({
+queue.add({
   type: 'send_email',
   to: 'user@example.com',
   subject: 'Welcome!',
@@ -98,7 +98,7 @@ const queue = new Queue({
 Add a task to the queue.
 
 ```javascript
-const taskId = await queue.add({
+const taskId = queue.add({
   action: 'process_image',
   imageUrl: 'https://example.com/image.jpg',
   userId: 123,
@@ -270,8 +270,8 @@ import Queue from '@sturmfrei/litequu';
 const queue = new Queue();
 
 // Add some tasks
-await queue.add({ type: 'backup', table: 'users' });
-await queue.add({ type: 'backup', table: 'orders' });
+queue.add({ type: 'backup', table: 'users' });
+queue.add({ type: 'backup', table: 'orders' });
 
 // Process tasks
 await queue.processOnce(async (task) => {
@@ -296,7 +296,7 @@ queue.process(async (task) => {
 });
 
 // Tasks will be processed automatically as they're added
-await queue.add({ work: 'to_do' });
+queue.add({ work: 'to_do' });
 ```
 
 ### Error Handling and Retries

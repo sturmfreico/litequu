@@ -327,7 +327,7 @@ describe('Queue', () => {
     //   // Force database error by closing it
     //   await queue.db.close();
     //   try {
-    //     await queue.add({ test: 'data' });
+    //     queue.add({ test: 'data' });
     //   } catch (error) {
     //     // Expected error due to closed database
     //     caughtError = error;
