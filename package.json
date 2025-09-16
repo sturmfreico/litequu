@@ -1,6 +1,6 @@
 {
   "name": "@sturmfrei/litequu",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "A simple same-thread queuing system for Node.js using SQLite with retry mechanism and exponential backoff",
   "main": "src/index.js",
   "type": "module",
